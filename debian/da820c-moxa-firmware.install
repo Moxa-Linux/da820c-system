@@ -1,1 +1,1 @@
-moxa-firmware/firmware/* /lib/firmware/
+firmware/* /lib/firmware/
