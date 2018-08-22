@@ -1,0 +1,25 @@
+Source: da820c-system
+Section: admin
+Priority: required
+Maintainer: Elvis Yao <ElvisCW.Yao@moxa.com>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.1.2
+Homepage: https://www.moxa.com/
+
+Package: da820c-base-system
+Architecture: any
+Depends: ${misc:Depends},
+Description: Base system for DA-820C
+ It contains the necessary tools for setting up DA-820C
+
+Package: da820c-modules-std
+Architecture: any
+Depends: ${misc:Depends},
+Description: DA-820C standard kernel modules
+ The Linux standard kernel modules for use on DA-820C
+
+Package: da820c-moxa-firmware
+Architecture: all
+Depends: ${misc:Depends},
+Description: DA-820C platform firmware files.
+ The Linux firmare files for use on DA-820C
