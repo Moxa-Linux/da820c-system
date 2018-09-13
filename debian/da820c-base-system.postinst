@@ -20,6 +20,9 @@ set -e
 
 case "$1" in
     configure)
+    echo "i2c-dev" >> /etc/modules
+    echo "misc-moxa-da820c" >> /etc/modules
+    echo "hid-ft260" >> /etc/modules
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
