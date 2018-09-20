@@ -1,0 +1,246 @@
+#!/bin/bash
+
+MAX_GPIO_PORT_NUM=1
+
+# FT4232 0x26, UART Port 0:4
+UART_GPIO_2=(467 468 469 470)
+UART_GPIO_3=(471 472 473 474)
+UART_GPIO_4=(475 476 477 478)
+UART_GPIO_5=(479 480 481 482)
+
+# FT4232 0x27, UART Port 0:4
+UART_GPIO_6=(451 452 453 454)
+UART_GPIO_7=(455 456 457 458)
+UART_GPIO_8=(459 460 461 462)
+UART_GPIO_9=(463 464 465 466)
+
+RS232_MODE=0
+RS485_MODE=1
+RS422_MODE=2
+RS232_GPIO_MODE=(1 1 0 0)
+RS485_GPIO_MODE=(0 0 0 1)
+RS422_GPIO_MODE=(0 0 1 0)
+
+RS232_MODE_STR="Now setting is RS232 mode"
+RS485_MODE_STR="Now setting is RS485-2W mode"
+RS422_MODE_STR="Now setting is RS422/RS485-4W mode"
+
+declare CUR_UART
+
+check_root_user() {
+	if [ x"$(whoami)" != x"root" ]; then
+		echo "Permission denied."
+		exit -3
+	fi
+}
+
+usage() {
+	echo -ne "Usage: /usr/bin/setinterface device-node [interface-no]\n"
+	echo -ne "\tdevice-node     - /dev/ttyMn, n = [0:${MAX_GPIO_PORT_NUM}]\n"
+	echo -ne "\tinterface-no    - following:\n"
+	echo -ne "\tnone - to view now setting\n"
+	echo -ne "\t0 - set to RS232 interface\n"
+	echo -ne "\t1 - set to RS485-2W interface\n"
+	echo -ne "\t2 - set to RS422/RS485-4W interface\n"
+	echo -ne "\n"
+	exit 0
+}
+
+io_board_uart_mode() {
+	port=$1
+	mode=$2
+
+	if [ -z "$mode" ]; then
+		# get mode
+		if [ x"1" == x"$(cat /sys/class/gpio/uart${port}_232/value)" ]; then
+			echo $RS232_MODE_STR
+		elif [ x"1" == x"$(cat /sys/class/gpio/uart${port}_485/value)" ]; then
+			echo $RS485_MODE_STR
+		elif [ x"1" == x"$(cat /sys/class/gpio/uart${port}_422/value)" ]; then
+			echo $RS422_MODE_STR
+		fi
+		exit 0
+
+	# set mode
+	elif [ x"$mode" == x"$RS232_MODE" ]; then
+		echo 1 > /sys/class/gpio/uart${port}_232/value 2>/dev/null
+	elif [ x"$mode" == x"$RS485_MODE" ]; then
+		echo 1 > /sys/class/gpio/uart${port}_485/value 2>/dev/null
+	elif [ x"$mode" == x"$RS422_MODE" ]; then
+		echo 1 > /sys/class/gpio/uart${port}_422/value 2>/dev/null
+	else
+		echo "Cannot recognize the mode. Exit."
+		exit -1
+	fi
+
+	io_board_uart_mode $port
+}
+
+exp_board_uart_mode() {
+	port=$1
+	mode=$2
+	gpio_init $port
+
+	if [ -z "$mode" ]; then
+		# get mode
+		exp_board_get_uart_mode
+		exit 0
+
+	# set mode
+	elif [ x"$mode" == x"$RS232_MODE" ]; then
+		exp_board_set_uart_mode $RS232_MODE
+	elif [ x"$mode" == x"$RS485_MODE" ]; then
+		exp_board_set_uart_mode $RS485_MODE
+	elif [ x"$mode" == x"$RS422_MODE" ]; then
+		exp_board_set_uart_mode $RS422_MODE
+	else
+		echo "Cannot recognize the mode. Exit."
+		exit -1
+	fi
+
+	exp_board_uart_mode $port
+}
+
+exp_board_get_uart_mode() {
+	local -a pin_array
+	local -a cmp_result
+
+	# fetch GPIO PIN status
+	for ((i=0; i<${#CUR_UART[@]}; i++)); do
+		pin_array[$i]=$(cat /sys/class/gpio/gpio${CUR_UART[$i]}/value)
+	done
+
+	# RS232 comparison
+	cmp_result=$(diff_array pin_array[@] RS232_GPIO_MODE[@])
+	if [ x"${cmp_result}" == x"0" ]; then
+		echo $RS232_MODE_STR
+		return
+	fi
+
+	# RS485-2W comparison
+	cmp_result=$(diff_array pin_array[@] RS485_GPIO_MODE[@])
+	if [ x"${cmp_result}" == x"0" ]; then
+		echo $RS485_MODE_STR
+		return
+	fi
+
+	# RS422/485-4W comparison
+	cmp_result=$(diff_array pin_array[@] RS422_GPIO_MODE[@])
+	if [ x"${cmp_result}" == x"0" ]; then
+		echo $RS422_MODE_STR
+		return
+	fi
+
+	echo "Cannot recognize current mode in UART Port#$target_dev"
+}
+
+exp_board_set_uart_mode() {
+	mode=$1
+	case "$mode" in
+		$RS422_MODE) # RS-422 mode
+			for ((i=0; i<${#CUR_UART[@]}; i++)); do
+				echo ${RS422_GPIO_MODE[$i]} > /sys/class/gpio/gpio${CUR_UART[$i]}/value
+			done
+		;;
+		$RS485_MODE) # RS-485 mode
+			for ((i=0; i<${#CUR_UART[@]}; i++)); do
+				echo ${RS485_GPIO_MODE[$i]} > /sys/class/gpio/gpio${CUR_UART[$i]}/value
+			done
+		;;
+		$RS232_MODE) # RS-232 mode
+			for ((i=0; i<${#CUR_UART[@]}; i++)); do
+				echo ${RS232_GPIO_MODE[$i]} > /sys/class/gpio/gpio${CUR_UART[$i]}/value
+			done
+		;;
+		*)
+			echo "Cannot recognize the mode"
+		;;
+	esac
+}
+
+# 
+# This function will compare two arrays value in order to recognize current UART mode. 
+#
+diff_array()
+{
+	declare -a arr1=("${!1}")
+	declare -a arr2=("${!2}")
+	[ ${#arr1[*]} != ${#arr2[*]} ] && { echo arrays different size; exit 1; }
+	for ii in ${!arr1[*]}; do
+		[ "${arr1[$ii]}" == "${arr2[$ii]}" ] || { echo different element $ii; echo 1 && return; }
+	done
+	echo 0
+}
+
+#
+# Init GPIO PIN status, this function will be only executed ONCE
+#
+gpio_init_action()
+{
+	# export the gpio if it's not existed
+	uart_port=$1
+	if [ ! -f /sys/class/gpio/gpio$uart_port/value ]; then
+		echo $uart_port > /sys/class/gpio/export
+	fi
+
+	# set uart port as output
+	direction=$(cat /sys/class/gpio/gpio$uart_port/direction)
+	if [ x"$direction" == x"in" ]; then
+		echo "out" > /sys/class/gpio/gpio$uart_port/direction
+	fi
+}
+
+gpio_init()
+{
+	# get current UART PIN from configuration file
+	uart_port=$1
+	CUR_UART=($(eval "echo \${"UART_GPIO_${uart_port}[@]"}"))
+	
+	if [ x"$CUR_UART" == x"" ]; then
+		echo "The parameter is incorrect."		
+		exit 2
+	fi	
+	
+	for (( i=0; i<${#CUR_UART[@]}; i++ )); do
+		gpio_init_action ${CUR_UART[$i]}
+	done
+}
+
+main() {
+	if dmesg | grep -q "pca9535"; then
+		# if the UART expansion card is on slot
+		MAX_GPIO_PORT_NUM=9
+	fi
+
+	if [ x"$1" == x"-h" ]; then
+		usage
+	fi
+
+	check_root_user
+
+	#
+	# Note: Check the number of ports by product name.
+	# If the model name is DA-820C: the number of serial ports should not over 9.
+	# 0~1 are on I/O board, 2~9 are on expansion board.
+	# We will show the information. This model only supports two serial ports in this model.
+	#
+
+	port=${1##*/dev/ttyM}
+	mode=$2
+
+	if [ ! -e $1 ]; then
+		echo "Target device node $1 is not existed. Exit."
+		exit -1
+	fi
+
+	if [ $port -ge 0 ] && [ $port -le 1 ]; then
+		io_board_uart_mode $(($port+1)) $mode
+	elif [ $port -ge 2 ] && [ $port -le $MAX_GPIO_PORT_NUM ]; then
+		exp_board_uart_mode $port $mode
+	else
+		echo "Target device node $1 is invalid. Exit."
+		exit -1
+	fi
+}
+
+main $1 $2
