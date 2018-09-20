@@ -1,0 +1,36 @@
+#! /bin/bash
+
+ID="0003:0403:6030.0003"
+
+ft260_bind() {
+	# check i2c adapter is existed
+	if dmesg | grep -q "FT260"; then
+		echo $ID > /sys/bus/hid/drivers/hid-generic/unbind
+		echo $ID > /sys/bus/hid/drivers/ft260/bind
+	fi
+
+	echo "pca9535 0x26" > /sys/bus/i2c/devices/i2c-7/new_device
+	echo "pca9535 0x27" > /sys/bus/i2c/devices/i2c-7/new_device
+}
+
+ft260_unbind() {
+	# check driver is on binding status
+	if dmesg | grep -q "ft260 0003:0403:6030.0003"; then
+		echo $ID > /sys/bus/hid/drivers/ft260/unbind
+	fi
+}
+
+case "$1" in
+	start)
+		# wait for ftp260 driver probe
+		sleep 3
+		ft260_bind
+	;;
+	stop)
+		ft260_unbind
+	;;
+	*)
+		echo "Usage: $0 start|stop" >&2
+		exit 3
+	;;
+esac

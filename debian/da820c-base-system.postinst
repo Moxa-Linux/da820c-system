@@ -23,6 +23,7 @@ case "$1" in
     echo "i2c-dev" >> /etc/modules
     echo "misc-moxa-da820c" >> /etc/modules
     echo "hid-ft260" >> /etc/modules
+    echo "gpio-pca953x" >> /etc/modules
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
