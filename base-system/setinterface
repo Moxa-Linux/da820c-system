@@ -13,8 +13,6 @@
 #	 new release based on orginal setinterface
 #
 
-MAX_GPIO_PORT_NUM=1
-
 # FT4232 0x26, UART Port 0:4
 UART_GPIO_2=(467 468 469 470)
 UART_GPIO_3=(471 472 473 474)
@@ -144,7 +142,7 @@ exp_board_get_uart_mode() {
 		return
 	fi
 
-	echo "Cannot recognize current mode in UART Port#$target_dev"
+	echo "Cannot recognize current mode. Exit."
 }
 
 exp_board_set_uart_mode() {
@@ -220,23 +218,11 @@ gpio_init()
 }
 
 main() {
-	if dmesg | grep -q "pca9535"; then
-		# if the UART expansion card is on slot
-		MAX_GPIO_PORT_NUM=9
-	fi
-
 	if [ x"$1" == x"-h" ]; then
 		usage
 	fi
 
 	check_root_user
-
-	#
-	# Note: Check the number of ports by product name.
-	# If the model name is DA-820C: the number of serial ports should not over 9.
-	# 0~1 are on I/O board, 2~9 are on expansion board.
-	# We will show the information. This model only supports two serial ports in this model.
-	#
 
 	port=${1##*/dev/ttyM}
 	mode=$2
@@ -256,6 +242,11 @@ main() {
 	fi
 }
 
+MAX_GPIO_PORT_NUM=1
+if dmesg | grep -q "ft260 0003:0403:6030.*"; then
+	# if the UART expansion card is on one slot
+	MAX_GPIO_PORT_NUM=$(ls /dev/ttyM* | wc -l)
+fi
 
 if [ $# -eq 0 ] || [ $# -gt 2 ]; then
 	usage

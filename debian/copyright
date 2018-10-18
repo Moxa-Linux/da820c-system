@@ -1,14 +1,13 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: uc3100-system
+Upstream-Name: da820c-system
 Source: http://gitlab.syssw.moxa.com/MXcore-Package/uc3100-system
 
 Files: *
-Copyright: 2017 MXcore
+Copyright: 2018 Moxa Corp.
 License:   Apache-2.0
 
 Files: debian/*
-Copyright: 2017 Wes Huang <Wes.Huang@moxa.com>
-           2017 SZ Lin (林上智) <sz.lin@moxa.com>
+Copyright: 2018 Elvis Yao <ElvisCW.Yao@moxa.com>
 License:   Apache-2.0
 
 License:   Apache-2.0

@@ -1,12 +1,11 @@
 [Unit]
 Description=Moxa FT260 driver binding service
+After=networking.service
+Before=mx_gpio_export.service
 
 [Service]
 Type=oneshot
 ExecStart=/sbin/mx_ft260_bind start
-ExecStop=/sbin/mx_ft260_bind stop
-After=networking.service
-Before=mx_gpio_export.service
 RemainAfterExit=yes
 
 [Install]
