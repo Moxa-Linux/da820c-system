@@ -6,3 +6,4 @@ base-system/mx_gpio_export /sbin
 base-system/mx_ft260_bind.service /etc/systemd/system/multi-user.target.wants
 base-system/mx_ft260_bind /sbin
 base-system/setinterface /sbin
+base-system/blacklist.conf /etc/modprobe.d
