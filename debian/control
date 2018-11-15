@@ -19,7 +19,7 @@ Description: DA-820C standard kernel modules
  The Linux kernel modules for use on DA-820C
 
 Package: da820c-moxa-firmware
-Architecture: all
+Architecture: any
 Depends: ${misc:Depends},
 Description: DA-820C platform firmware files.
  The Linux firmare files for use on DA-820C
