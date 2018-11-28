@@ -1,14 +1,10 @@
 #!/bin/sh
+PRODUCT_NAME="`cat /sys/class/dmi/id/product_name`"
 
-#PRODUCT_NAME="MPC-`cat /sys/class/dmi/id/product_name|cut -f2 -d-`"
-#PRODUCT_NAME="MPC-`cat /sys/class/dmi/id/board_name|cut -f2 -d-`"
-#[ -z "$PRODUCT_NAME" ] && PRODUCT_NAME="V-2406C"
-
-PRODUCT_NAME="DA-820C"
-VERSION=1.0.0
+[ -z "$PRODUCT_NAME" ] && PRODUCT_NAME="DA-820C"
 
 if [ "$1" = "-a" ]; then
-	str_version="$PRODUCT_NAME firmware version $VERSION Build `cat /etc/.builddate`"
+	str_version="$PRODUCT_NAME firmware version `cat /etc/.moxaversion` Build `cat /etc/.moxabuildtime`"
 else
 	str_version="$PRODUCT_NAME"
 fi
