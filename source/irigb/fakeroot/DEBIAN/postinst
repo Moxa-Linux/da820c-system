@@ -1,0 +1,6 @@
+#! /bin/sh
+# postremoval script for apt-file
+set -e;
+
+insserv -d mx_irigb.sh
+/etc/init.d/mx_irigb.sh start || true

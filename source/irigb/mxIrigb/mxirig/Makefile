@@ -12,4 +12,5 @@ all:
 	$(AR) crv libmxirig-i686.a mxirigi686.o
 
 clean:
-	#rm -rf *.o
+	rm -rf *.o
+	rm -rf *.a
