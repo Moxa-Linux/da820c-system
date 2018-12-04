@@ -13,7 +13,8 @@ ft260_bind() {
 
 case "$1" in
 	start)
-		sleep 2
+		# delay for waiting ft260 driver probed
+		sleep 1
 		ft260_bind
 	;;
 	*)
