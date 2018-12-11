@@ -8,3 +8,4 @@ base-system/mx_ft260_bind /sbin
 base-system/setinterface /sbin
 base-system/kversion /sbin
 base-system/blacklist.conf /etc/modprobe.d
+base-system/moxa-dio-control.json /etc/moxa-configs
