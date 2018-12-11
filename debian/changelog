@@ -1,3 +1,14 @@
+da820c-system (1.0.1+deb9) stretch; urgency=low
+
+  * Expansion module drivers: IRIG-B, HSRPRP
+  * Expansion module utilities: IRIG-B, HSRPRP
+  * Utility: kversion
+  * Drivers: remove USB power, detect and uart ioctl function in moxa-misc-da820c
+  * add moxa-dio-control configuration files
+  * add drivers and utilities source code
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 11 Dec 2018 11:41:53 +0800
+
 da820c-system (1.0.0+deb9) stretch; urgency=low
 
   * Initial release.
