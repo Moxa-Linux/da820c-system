@@ -45,16 +45,6 @@
 #define DO_ON			1
 #define DO_OFF			0
 
-#define USBPWR_NUM		3
-#define USBPWR_PATTERN		"111"
-#define USBPWR_ON		1
-#define USBPWR_OFF		0
-
-#define USBDET_NUM		3
-#define USBDET_PATTERN		"111"
-#define USBDET_ON		1
-#define	USBDET_OFF		0
-
 #define SIF_NUM			2
 #define SIF_PATTERN		"12"
 
@@ -64,16 +54,12 @@
 #define MOXA_RELAY_MINOR	(MOXA_SIF_MINOR+1)
 #define MOXA_DI_MINOR		(MOXA_RELAY_MINOR+1)
 #define MOXA_DO_MINOR		(MOXA_DI_MINOR+1)
-#define MOXA_USBPWR_MINOR	(MOXA_DO_MINOR+1)
-#define MOXA_USBDET_MINOR	(MOXA_USBPWR_MINOR+1)
 
 #define PLED_NAME		"pled"
 #define SIF_NAME		"uart"
 #define RELAY_NAME		"relay"
 #define DI_NAME			"di"
 #define DO_NAME			"do"
-#define USBPWR_NAME		"usbpwr"
-#define USBDET_NAME		"usbdet"
 
 /* Ioctl number */
 #define MOXA			0x400
@@ -533,168 +519,6 @@ static struct miscdevice do_miscdev = {
 };
 
 /*
- * module: USB power section
- */
-static int usbpwr_open(struct inode *inode, struct file *file)
-{
-	return 0;
-}
-
-static int usbpwr_release(struct inode *inode, struct file *file)
-{
-	return 0;
-}
-
-/* Write function
- * Note: use echo 111 > /dev/usbpwr
- * The order is [usbpwr_rear, usbpwr_wafer, usbpwr_front\n]
- */
-ssize_t usbpwr_write(struct file *filp, const char __user *buf, size_t count,
-	loff_t *pos)
-{
-	int i;
-	char stack_buf[USBPWR_NUM];
-
-	/* check input value */
-	if(count != (sizeof(stack_buf)+1)) {
-		printk( KERN_ERR "Moxa do error! paramter should be %lu \
-digits, like \"%s\" \n", sizeof(stack_buf), USBPWR_PATTERN);
-		return -EINVAL;
-	}
-
-	if(copy_from_user(stack_buf, buf, count-1)) {
-		return 0;
-	}
-
-	for (i = 0; i < sizeof(stack_buf); i++) {
-		if (stack_buf[i] == '1') {
-			do_set(i, USBPWR_ON);
-		} else if (stack_buf[i] == '0') {
-			do_set(i, USBPWR_OFF);
-		} else {
-			printk("USB power: error, you input is %s", stack_buf);
-			break;
-		}
-	}
-
-	return count;
-}
-
-ssize_t usbpwr_read(struct file *filp, char __user *buf, size_t count,
-	loff_t *pos)
-{
-	int i;
-	int ret;
-	char stack_buf[USBPWR_NUM];
-
-	for (i = 0; (i < sizeof(stack_buf)) && (i < count); i++) {
-		if (!do_get(i, &ret)) {
-			if (ret) {
-				stack_buf[i] = '0' + USBPWR_ON;
-			} else {
-				stack_buf[i] = '0' + USBPWR_OFF;
-			}
-		} else {
-			return -EINVAL;
-		}
-	}
-
-	ret = copy_to_user((void*)buf, (void*)stack_buf, sizeof(stack_buf));
-	if(ret < 0) {
-		printk(KERN_ERR "Moxa USB power error! paramter should be %lu \
-digits, like \"%s\" \n", sizeof(stack_buf), USBPWR_PATTERN);
-		return -ENOMEM;
-	}
-
-	return sizeof(stack_buf);
-}
-
-/* define which file operations are supported */
-struct file_operations usbpwr_fops = {
-	.owner		= THIS_MODULE,
-	.write		= usbpwr_write,
-	.read		= usbpwr_read,
-	.open		= usbpwr_open,
-	.release	= usbpwr_release,
-};
-
-/* register as misc driver */
-static struct miscdevice usbpwr_miscdev = {
-	.minor = MOXA_USBPWR_MINOR,
-	.name = USBPWR_NAME,
-	.fops = &usbpwr_fops,
-};
-
-/*
- * module: USB detection section
- */
-static int usbdet_open(struct inode *inode, struct file *file)
-{
-	return 0;
-}
-
-static int usbdet_release(struct inode *inode, struct file *file)
-{
-	return 0;
-}
-
-/* Write function
- * Note: use echo 111 > /dev/usbdet
- * The order is [usbdet_rear, usbdet_wafer, usbdet_front\n]
- */
-ssize_t usbdet_write(struct file *filp, const char __user *buf, size_t count,
-	loff_t *pos)
-{
-	printk("<1> %s[%d]\n", __FUNCTION__, __LINE__);
-	return 0;
-}
-
-ssize_t usbdet_read(struct file *filp, char __user *buf, size_t count,
-	loff_t *pos)
-{
-	int i;
-	int ret;
-	char stack_buf[USBDET_NUM];
-
-	for (i = 0; (i < sizeof(stack_buf)) && (i < count); i++) {
-		if (!do_get(i, &ret)) {
-			if ( ret ) {
-				stack_buf[i] = '0' + USBDET_ON;
-			} else {
-				stack_buf[i] = '0' + USBDET_OFF;
-			}
-		} else {
-			return -EINVAL;
-		}
-	}
-
-	ret = copy_to_user((void*)buf, (void*)stack_buf, sizeof(stack_buf));
-	if(ret < 0) {
-		printk(KERN_ERR "Moxa do error! paramter should be %lu \
-digits, like \"%s\" \n", sizeof(stack_buf), USBDET_PATTERN);
-		return -ENOMEM;
-	}
-
-	return sizeof(stack_buf);
-}
-
-/* define which file operations are supported */
-struct file_operations usbdet_fops = {
-	.owner		= THIS_MODULE,
-	.write		= usbdet_write,
-	.read		= usbdet_read,
-	.open		= usbdet_open,
-	.release	= usbdet_release,
-};
-
-/* register as misc driver */
-static struct miscdevice usbdet_miscdev = {
-	.minor = MOXA_USBDET_MINOR,
-	.name = USBDET_NAME,
-	.fops = &usbdet_fops,
-};
-
-/*
  * module: Serial interface section
  */
 static int sif_open(struct inode *inode, struct file *file)
@@ -770,56 +594,11 @@ ssize_t sif_read(struct file *filp, char __user *buf, size_t count,
 	return sizeof(stack_buf);
 }
 
-/* 
- * ioctl - I/O control
- */
-static long sif_ioctl(struct file *file,unsigned int cmd, unsigned long arg)
-{
-	unsigned char port;
-	unsigned char opmode;
-	int val;
-
-	switch (cmd) {
-	case MOXA_SET_OP_MODE:
-		if (copy_from_user(&opmode, (unsigned char *) arg, sizeof(opmode))) {
-			return -EFAULT;
-		}
-		port = opmode >> 4 ;
-		opmode = opmode & 0xf;
-		if (0 != uartif_set(opmode >> 4, opmode & 0xf)) {
-			printk("uart: the mode is not supported, \
-the input is %x\n", opmode);
-			return -EFAULT;
-		}
-
-		break;
-
-	case MOXA_GET_OP_MODE:
-		if(copy_from_user(&port, (unsigned char *)arg, sizeof(port))){
-			return -EFAULT;
-		}
-
-		if(0 != uartif_get(port, &val)) {
-			return -EINVAL;
-		}
-		opmode = val;
-		if(copy_to_user((unsigned char*)arg, &opmode, sizeof(opmode))) {
-			return -EFAULT;
-		}
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
 /* define which file operations are supported */
 struct file_operations sif_fops = {
 	.owner		= THIS_MODULE,
 	.write		= sif_write,
 	.read		= sif_read,
-	.unlocked_ioctl	= sif_ioctl,
 	.open		= sif_open,
 	.release	= sif_release,
 };
@@ -950,79 +729,6 @@ static struct gpio_chip moxa_gpio_relay_chip = {
 };
 
 /*
- * module: USB power chip-section
- */
-static int moxa_gpio_usbpwr_get(struct gpio_chip *gc, unsigned gpio_num)
-{
-	int val;
-
-	if (0==usbpwr_get(gpio_num, &val)) {
-		if (USBPWR_ON==val)
-			return 1;
-	}
-	return 0;
-}
-
-static void moxa_gpio_usbpwr_set(struct gpio_chip *gc, unsigned gpio_num, int val)
-{
-	if ( val )
-		val = USBPWR_ON;
-	else
-		val = USBPWR_OFF;
-	usbpwr_set(gpio_num, val);
-}
-
-const char *gpio_usbpwr_names[] = {
-	"usbpwr_rear",
-	"usbpwr_wafer",
-	"usbpwr_front",
-};
-
-static struct gpio_chip moxa_gpio_usbpwr_chip = {
-	.label		= "moxa-gpio-usbpwr",
-	.owner		= THIS_MODULE,
-	.get		= moxa_gpio_usbpwr_get,
-	.set		= moxa_gpio_usbpwr_set,
-	.base		= -1,
-	.ngpio		= sizeof(usbpwr_pin_def)/2,
-	.names		= gpio_usbpwr_names
-};
-
-/*
- * module: USB detection chip-section
- */
-static int moxa_gpio_usbdet_get(struct gpio_chip *gc, unsigned gpio_num)
-{
-	int val;
-
-	if (0==usbdet_get(gpio_num, &val)) {
-		if (USBDET_ON==val)
-			return 1;
-	}
-	return 0;
-}
-
-static void moxa_gpio_usbdet_set(struct gpio_chip *gc, unsigned gpio_num, int val)
-{
-}
-
-const char *gpio_usbdet_names[] = {
-	"usbdet_rear",
-	"usbdet_wafer",
-	"usbdet_front",
-};
-
-static struct gpio_chip moxa_gpio_usbdet_chip = {
-	.label		= "moxa-gpio-usbdet",
-	.owner		= THIS_MODULE,
-	.get		= moxa_gpio_usbdet_get,
-	.set		= moxa_gpio_usbdet_set,
-	.base		= -1,
-	.ngpio		= sizeof(usbdet_pin_def)/2,
-	.names		= gpio_usbdet_names
-};
-
-/*
  * module: Programable LED chip-section
  */
 static int moxa_gpio_pled_get(struct gpio_chip *gc, unsigned gpio_num)
@@ -1117,7 +823,7 @@ static int __init moxa_misc_init_module (void)
 
 	printk("initializing MOXA misc. device module\n");
 
-	// register misc driver
+	/* register misc driver */
 	retval = misc_register(&pled_miscdev);
 	if(retval != 0) {
 		printk("Moxa pled driver: Register misc fail !\n");
@@ -1148,89 +854,58 @@ static int __init moxa_misc_init_module (void)
 		goto moxa_misc_init_module_err5;
 	}
 
-	retval = misc_register(&usbpwr_miscdev);
-	if(retval != 0) {
-		printk("Moxa USB power driver: Register misc fail !\n");
-		goto moxa_misc_init_module_err6;
-	}
-
-	retval = misc_register(&usbdet_miscdev);
-	if(retval != 0) {
-		printk("Moxa USB detection driver: Register misc fail !\n");
-		goto moxa_misc_init_module_err7;
-	}
-
 	retval = gpio_init();
 	if(retval != 0) {
 		printk("Moxa GPIO init driver: gpio_init() fail !\n");
-		goto moxa_misc_init_module_err8;
+		goto moxa_misc_init_module_err6;
 	}
 
 #ifdef SUPPORT_GPIOSYSFS
 	retval = gpiochip_add(&moxa_gpio_relay_chip);
 	if(retval < 0) {
 		printk("Moxa realy driver: gpiochip_add(&moxa_gpio_relay_chip) fail !\n");
-		goto moxa_misc_init_module_err9;
+		goto moxa_misc_init_module_err7;
 	}
 
 	retval = gpiochip_add(&moxa_gpio_pled_chip);
 	if(retval < 0) {
 		printk("Moxa pled driver: gpiochip_add(&moxa_gpio_pled_chip) fail !\n");
-		goto moxa_misc_init_module_err10;
+		goto moxa_misc_init_module_err8;
 	}
 
 	retval = gpiochip_add(&moxa_gpio_uartif_chip);
 	if(retval < 0) {
 		printk("Moxa uart interface driver: gpiochip_add(&moxa_gpio_uartif_chip) fail !\n");
-		goto moxa_misc_init_module_err11;
+		goto moxa_misc_init_module_err9;
 	}
 
 	retval = gpiochip_add(&moxa_gpio_do_chip);
 	if(retval < 0) {
 		printk("Moxa DO driver: gpiochip_add(&moxa_gpio_do_chip) fail !\n");
-		goto moxa_misc_init_module_err12;
+		goto moxa_misc_init_module_err10;
 	}
 
 	retval = gpiochip_add(&moxa_gpio_di_chip);
 	if(retval < 0) {
 		printk("Moxa DI driver: gpiochip_add(&moxa_gpio_di_chip) fail !\n");
-		goto moxa_misc_init_module_err13;
+		goto moxa_misc_init_module_err11;
 	}
 
-	retval = gpiochip_add(&moxa_gpio_usbpwr_chip);
-	if(retval < 0) {
-		printk("Moxa USB power driver: gpiochip_add(&moxa_gpio_usbpwr_chip) fail !\n");
-		goto moxa_misc_init_module_err14;
-	}
-
-	retval = gpiochip_add(&moxa_gpio_usbdet_chip);
-	if(retval < 0) {
-		printk("Moxa USB detection driver: gpiochip_add(&moxa_gpio_usbdet_chip) fail !\n");
-		goto moxa_misc_init_module_err15;
-	}
 #endif /* SUPPORT_GPIOSYSFS */
 
 	return 0;
 #ifdef CONFIG_GPIO_SYSFS
-moxa_misc_init_module_err15:
-	gpiochip_remove(&moxa_gpio_usbpwr_chip);
-moxa_misc_init_module_err14:
-	gpiochip_remove(&moxa_gpio_di_chip);
-moxa_misc_init_module_err13:
-	gpiochip_remove(&moxa_gpio_do_chip);
-moxa_misc_init_module_err12:
-	gpiochip_remove(&moxa_gpio_uartif_chip);
 moxa_misc_init_module_err11:
-	gpiochip_remove(&moxa_gpio_pled_chip);
+	gpiochip_remove(&moxa_gpio_do_chip);
 moxa_misc_init_module_err10:
+	gpiochip_remove(&moxa_gpio_uartif_chip);
+moxa_misc_init_module_err9:
+	gpiochip_remove(&moxa_gpio_pled_chip);
+moxa_misc_init_module_err8:
 	gpiochip_remove(&moxa_gpio_relay_chip);
 #endif
-moxa_misc_init_module_err9:
-	gpio_exit();
-moxa_misc_init_module_err8:
-	misc_deregister(&usbdet_miscdev);
 moxa_misc_init_module_err7:
-	misc_deregister(&usbpwr_miscdev);
+	gpio_exit();
 moxa_misc_init_module_err6:
 	misc_deregister(&sif_miscdev);
 moxa_misc_init_module_err5:
@@ -1254,16 +929,12 @@ static void __exit moxa_misc_cleanup_module (void)
 	misc_deregister(&sif_miscdev);
 	misc_deregister(&di_miscdev);
 	misc_deregister(&do_miscdev);
-	misc_deregister(&usbpwr_miscdev);
-	misc_deregister(&usbdet_miscdev);
 #ifdef SUPPORT_GPIOSYSFS
 	gpiochip_remove(&moxa_gpio_pled_chip);
 	gpiochip_remove(&moxa_gpio_relay_chip);
 	gpiochip_remove(&moxa_gpio_uartif_chip);
 	gpiochip_remove(&moxa_gpio_di_chip);
 	gpiochip_remove(&moxa_gpio_do_chip);
-	gpiochip_remove(&moxa_gpio_usbpwr_chip);
-	gpiochip_remove(&moxa_gpio_usbdet_chip);
 #endif /* SUPPORT_GPIOSYSFS */
 	gpio_exit();
 }
