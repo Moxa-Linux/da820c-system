@@ -89,18 +89,18 @@ static u8 uartif_pin_def[] = {
 
 /* DI pin */
 static u8 di_pin_def[] = {
-	GPIO_GROUP_8, GPIO_BIT_2,	/* di1 */
-	GPIO_GROUP_8, GPIO_BIT_3,	/* di2 */
-	GPIO_GROUP_8, GPIO_BIT_4,	/* di3 */
-	GPIO_GROUP_8, GPIO_BIT_5,	/* di4 */
+	GPIO_GROUP_8, GPIO_BIT_2,	/* di0 */
+	GPIO_GROUP_8, GPIO_BIT_3,	/* di1 */
+	GPIO_GROUP_8, GPIO_BIT_4,	/* di2 */
+	GPIO_GROUP_8, GPIO_BIT_5,	/* di3 */
+	GPIO_GROUP_3, GPIO_BIT_6,	/* do4 */
+	GPIO_GROUP_3, GPIO_BIT_7,	/* do5 */
 };
 
 /* DO pin */
 static u8 do_pin_def[] = {
-	GPIO_GROUP_3, GPIO_BIT_3,	/* do1 */
-	GPIO_GROUP_3, GPIO_BIT_4,	/* do2 */
-	GPIO_GROUP_3, GPIO_BIT_6,	/* do3 */
-	GPIO_GROUP_3, GPIO_BIT_7,	/* do4 */
+	GPIO_GROUP_3, GPIO_BIT_3,	/* do0 */
+	GPIO_GROUP_3, GPIO_BIT_4,	/* do1 */
 };
 
 static u8 ports[1] = { 0x2e };
