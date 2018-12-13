@@ -103,21 +103,6 @@ static u8 do_pin_def[] = {
 	GPIO_GROUP_3, GPIO_BIT_7,	/* do4 */
 };
 
-/* USB power */
-static u8 usbpwr_pin_def[] = {
-	GPIO_GROUP_2, GPIO_BIT_7,	/* usbpwr_rear */
-	GPIO_GROUP_4, GPIO_BIT_1,	/* usbpwr_wafer */
-	GPIO_GROUP_4, GPIO_BIT_6,	/* usbpwr_front */
-};
-
-/* USB detection */
-static u8 usbdet_pin_def[] = {
-	GPIO_GROUP_5, GPIO_BIT_3,	/* usbdet_rear */
-	GPIO_GROUP_6, GPIO_BIT_7,	/* usbdet_wafer */
-	GPIO_GROUP_2, GPIO_BIT_3,	/* usbdet_front */
-};
-
-
 static u8 ports[1] = { 0x2e };
 static u8 port;
  
@@ -262,36 +247,6 @@ int relay_get(unsigned num, int *val)
 
 	*val = read_gpio(relay_pin_def, num);
 
-	return 0;
-}
-
-int usbpwr_set(unsigned num, int val)
-{
-	if (num >= (sizeof(usbpwr_pin_def)/2)) {
-		return -EINVAL;
-	}
-
-	write_gpio(usbpwr_pin_def, num, val);
-	return 0;
-}
-
-int usbpwr_get(unsigned num, int *val)
-{
-	if (num >= (sizeof(usbpwr_pin_def)/2)) {
-		return -EINVAL;
-	}
-
-	*val = read_gpio(usbpwr_pin_def, num);
-	return 0;
-}
-
-int usbdet_get(unsigned num, int *val)
-{
-	if (num >= (sizeof(usbdet_pin_def)/2)) {
-		return -EINVAL;
-	}
-
-	*val = read_gpio(usbdet_pin_def, num);
 	return 0;
 }
 
