@@ -1,10 +1,7 @@
 base-system/motd /etc
 base-system/10-serial.rules /etc/udev/rules.d
 base-system/11-ft260-pca9535.rules /etc/udev/rules.d
-base-system/mx_gpio_export.service /etc/systemd/system/multi-user.target.wants
-base-system/mx_gpio_export /sbin
-base-system/mx_ft260_bind.service /etc/systemd/system/multi-user.target.wants
-base-system/mx_ft260_bind /sbin
+base-system/da820c_platform_init /sbin
 base-system/setinterface /sbin
 base-system/kversion /sbin
 base-system/blacklist.conf /etc/modprobe.d
