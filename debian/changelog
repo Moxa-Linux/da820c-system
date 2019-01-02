@@ -1,3 +1,11 @@
+da820c-system (1.0.2+deb9) stretch; urgency=low
+
+  * Service shall follow debian package standard
+  * Remove USB power and detect function in superio driver
+  * update DIO index due to HW change (2 DO and 6 DI)
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Wed, 02 Jan 2019 14:24:12 +0800
+
 da820c-system (1.0.1+deb9) stretch; urgency=low
 
   * Expansion module drivers: IRIG-B, HSRPRP
