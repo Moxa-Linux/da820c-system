@@ -4,6 +4,7 @@ After=getty.target
 
 [Service]
 Type=oneshot
+ExecStartPre=/bin/sleep 5
 ExecStart=/sbin/da820c_platform_init start
 ExecStop=/sbin/da820c_platform_init stop
 RemainAfterExit=yes
