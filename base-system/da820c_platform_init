@@ -11,6 +11,17 @@ bind_ft260_driver(){
 	done
 }
 
+unbind_ft260_driver(){
+	for filename in /sys/bus/i2c/devices/i2c-*/name; do
+		i2c_devname=$(cat ${filename})
+		if [[ $i2c_devname == *"FT260"* ]]; then
+			i2c_devpath=$(echo ${filename%/*})
+			echo "0x26" > ${i2c_devpath}/delete_device
+			echo "0x27" > ${i2c_devpath}/delete_device
+		fi
+	done
+}
+
 export_sys_gpio() {
 	local TARGET_GPIOCHIP=$1
 	local GPIOCHIP_NAME=gpiochip
@@ -21,9 +32,7 @@ export_sys_gpio() {
 		GPIO_EXPORT="unexport"
 	fi
 
-	#
 	# Export GPIOs
-	#
 	ls $GPIO_FS_PATH | grep $GPIOCHIP_NAME | while read -r chip ; do
 		GPIO_LABEL=$(cat $GPIO_FS_PATH/$chip/label)
 		if [[ "$GPIO_LABEL" != *"$TARGET_GPIOCHIP"* ]]; then
@@ -38,21 +47,18 @@ export_sys_gpio() {
 	done
 }
 
+
 main(){
 	case "$1" in
 		start)
-			# delay for waiting ft260 driver probed
-			sleep 1
 			bind_ft260_driver
-
-			# delay for waiting ft260 driver probed
-			sleep 1
 			export_sys_gpio "moxa-gpio"
 			export_sys_gpio "pca9535"
 		;;
 		stop)
 			export_sys_gpio "moxa-gpio" unexport
 			export_sys_gpio "pca9535" unexport
+			unbind_ft260_driver
 		;;
 		*)
 			echo "Usage: $0 start|stop" >&2
