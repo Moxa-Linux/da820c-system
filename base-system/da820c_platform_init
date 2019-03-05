@@ -1,5 +1,8 @@
 #!/bin/bash
 
+UARTCONF="/etc/moxa-configs/setinterface.conf"
+UARTPROG="/sbin/setinterface"
+
 bind_ft260_driver(){
 	for filename in /sys/bus/i2c/devices/i2c-*/name; do
 		i2c_devname=$(cat ${filename})
@@ -47,6 +50,36 @@ export_sys_gpio() {
 	done
 }
 
+setup_default_uart_mode() {
+	if [[ ! -f "$UARTCONF" ]]; then
+		echo "setinterface config file $UARTCONF is not existed. Exit."
+		exit 3
+	fi
+
+	if [[ ! -f "$UARTPROG" ]]; then
+		echo "setinterface program file $UARTPROG is not existed. Exit."
+		exit 3
+	fi
+
+	max_port_num=$(ls /dev/ttyM* | wc -l)
+	source $UARTCONF
+
+	index=0
+	while [ $index -lt $max_port_num ]; do
+		mode=$(eval "echo \$PORT$index")
+		devpath="/dev/ttyM$index"
+		if [ $mode -gt 2  ] || [ $mode -lt 0 ]; then
+			echo "Cannot recognize the mode. Set $devpath to RS232 mode."
+			mode=0
+		fi
+
+		if [ $mode ] && [ -e "$devpath" ]; then
+			echo "path $devpath mode $mode"
+			eval "$UARTPROG $devpath $mode"
+		fi
+		let 'index=index + 1'
+	done
+}
 
 main(){
 	case "$1" in
@@ -54,6 +87,7 @@ main(){
 			bind_ft260_driver
 			export_sys_gpio "moxa-gpio"
 			export_sys_gpio "pca9535"
+			setup_default_uart_mode
 		;;
 		stop)
 			export_sys_gpio "moxa-gpio" unexport
