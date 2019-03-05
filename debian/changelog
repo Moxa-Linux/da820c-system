@@ -1,3 +1,12 @@
+da820c-system (1.0.3+deb9) stretch; urgency=low
+
+  * Add UART mode save method
+  * Setup UART mode when boot
+  * kversion for fetching hardware info
+  * Fine tune boot script for probe FT260 driver
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 05 Mar 2019 18:49:35 +0800
+
 da820c-system (1.0.2+deb9) stretch; urgency=low
 
   * Service shall follow debian package standard
