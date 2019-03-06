@@ -11,3 +11,4 @@ base-system/setinterface.conf /etc/moxa-configs
 base-system/common-auth /etc/pam.d
 base-system/common-password /etc/pam.d
 base-system/interfaces /etc/network
+base-system/sshd_config /etc/ssh
