@@ -8,3 +8,5 @@ base-system/kversion /sbin
 base-system/blacklist.conf /etc/modprobe.d
 base-system/moxa-dio-control.json /etc/moxa-configs
 base-system/setinterface.conf /etc/moxa-configs
+base-system/common-auth /etc/pam.d
+base-system/common-password /etc/pam.d
