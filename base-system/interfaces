@@ -1,0 +1,33 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto enp0s31f6
+iface enp0s31f6 inet static
+	address 192.168.3.127
+	netmask 255.255.255.0
+	broadcast 192.168.3.255
+
+auto enp9s0
+iface enp9s0 inet static
+	address 192.168.4.127
+	netmask 255.255.255.0
+	broadcast 192.168.4.255
+
+auto enp10s0
+iface enp10s0 inet static
+	address 192.168.5.127
+	netmask 255.255.255.0
+	broadcast 192.168.5.255
+
+auto enp11s0
+iface enp11s0 inet static
+	address 192.168.6.127
+	netmask 255.255.255.0
+	broadcast 192.168.6.255
