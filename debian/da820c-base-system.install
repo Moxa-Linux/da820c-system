@@ -12,3 +12,4 @@ base-system/common-auth /etc/pam.d
 base-system/common-password /etc/pam.d
 base-system/interfaces /etc/network
 base-system/sshd_config /etc/ssh
+base-system/moxa.sh /etc/profile.d
