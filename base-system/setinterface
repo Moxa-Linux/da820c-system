@@ -77,7 +77,7 @@ save_status() {
 	do
 		get_port_mode $index
 		echo "Get port $index mode is $CUR_MODE"
-		eval "sed -i -e 's/PORT${index}=[0-9]/PORT${index}=${CUR_MODE}/g' $UARTCONF"
+		eval "sed -i -e '/#/!s/PORT${index}=[0-9]/PORT${index}=${CUR_MODE}/g' $UARTCONF"
 	done
 
 	exit 0
