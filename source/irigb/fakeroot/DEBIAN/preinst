@@ -1,4 +1,0 @@
-#! /bin/sh
-# preinst script for apt-file
-set -e;
-

@@ -1,6 +1,0 @@
-#! /bin/sh
-# preinst script for apt-file
-set -e;
-
-/etc/init.d/mx_irigb.sh stop || true
-insserv -r mx_irigb.sh
