@@ -1,3 +1,12 @@
+da820c-system (1.0.4+deb9) stretch; urgency=low
+
+  * remove irigb utility from source
+  * remove moxa dio control config file in install file
+  * add security settings
+  * add udev rules for persistent network interface
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Fri, 22 Mar 2019 18:34:31 +0800
+
 da820c-system (1.0.3+deb9) stretch; urgency=low
 
   * Add UART mode save method
