@@ -9,6 +9,10 @@ Homepage: https://www.moxa.com/
 Package: da820c-base-system
 Architecture: any
 Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         lm-sensors,
+         da820c-modules (= ${binary:Version}),
+         da820c-moxa-firmware (= ${binary:Version})
 Description: Base system for DA-820C
  It contains the necessary tools for setting up DA-820C
 

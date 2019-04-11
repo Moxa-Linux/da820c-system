@@ -44,6 +44,12 @@ case "$1" in
 	if [ "$?" != "0" ]; then
 		sed -i '$ a it8786_wdt' /etc/modules
 	fi
+
+	grep -wq "it87" /etc/modules
+	if [ "$?" != "0" ]; then
+		sed -i '$ a it87' /etc/modules
+	fi
+
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
