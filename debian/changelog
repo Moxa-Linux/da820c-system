@@ -1,3 +1,10 @@
+da820c-system (1.0.5+deb9) stretch; urgency=low
+
+  * fix: to fix failed to set xfermode error
+  * feat: add lm-sensors config and update debian control file for depends
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Fri, 12 Apr 2019 15:51:42 +0800
+
 da820c-system (1.0.4+deb9) stretch; urgency=low
 
   * remove irigb utility from source
