@@ -1,3 +1,12 @@
+da820c-system (1.0.6+deb9) stretch; urgency=low
+
+  * fix: add update-grub on system postinst
+  * fix: remove default network interface files
+  * fix: update 10-serial.rules to create ttyM0 & ttyM1
+  * fix: fix adding modules list method at base-system postinst
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 02 Jul 2019 18:02:47 +0800
+
 da820c-system (1.0.5+deb9) stretch; urgency=low
 
   * fix: to fix failed to set xfermode error
