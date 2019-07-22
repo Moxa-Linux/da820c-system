@@ -1,3 +1,12 @@
+da820c-system (1.0.7+deb9) stretch; urgency=low
+
+  * fix: upgrade da820c-modules to linux-image-4.9.0-9-amd64
+  * fix: update kversion get product name function
+  * feat: add gpio-pca953x driver source
+  * feat: add mx-ver to base-system
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Mon, 22 Jul 2019 10:36:53 +0800
+
 da820c-system (1.0.6+deb9) stretch; urgency=low
 
   * fix: add update-grub on system postinst
