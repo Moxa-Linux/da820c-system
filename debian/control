@@ -9,7 +9,6 @@ Homepage: https://www.moxa.com/
 Package: da820c-base-system
 Architecture: any
 Depends: ${misc:Depends},
-         ${shlibs:Depends},
          lm-sensors,
          da820c-modules (= ${binary:Version}),
          da820c-moxa-firmware (= ${binary:Version})
@@ -19,6 +18,7 @@ Description: Base system for DA-820C
 Package: da820c-modules
 Architecture: any
 Depends: ${misc:Depends},
+         linux-image-4.9.0-9-amd64 (>= 4.9.168-1)
 Description: DA-820C standard kernel modules
  The Linux kernel modules for use on DA-820C
 
