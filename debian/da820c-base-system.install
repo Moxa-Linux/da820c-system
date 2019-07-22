@@ -5,6 +5,7 @@ base-system/70-persistent-net.rules /etc/udev/rules.d
 base-system/da820c_platform_init /sbin
 base-system/setinterface /sbin
 base-system/kversion /sbin
+base-system/mx-ver /sbin
 base-system/blacklist.conf /etc/modprobe.d
 base-system/setinterface.conf /etc/moxa-configs
 base-system/common-auth /etc/pam.d
