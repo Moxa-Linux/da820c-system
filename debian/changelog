@@ -1,3 +1,11 @@
+da820c-system (1.0.8+deb9) stretch; urgency=low
+
+  * fix: fix typo for mx-ver
+  * fix: update moxa_da820c_misc for uart rs422 pull high RTS
+  * fix: update mx-ver for removing -a option
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Mon, 29 Jul 2019 16:23:47 +0800
+
 da820c-system (1.0.7+deb9) stretch; urgency=low
 
   * fix: upgrade da820c-modules to linux-image-4.9.0-9-amd64
