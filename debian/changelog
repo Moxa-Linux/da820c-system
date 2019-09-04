@@ -1,3 +1,11 @@
+da820c-system (1.0.9+deb9) stretch; urgency=low
+
+  * feat: add S3 suspend back event to reload ftdi driver
+  * fix: add -a option to mx-ver
+  * fix: remove check FT260 driver in setinterface
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 03 Sep 2019 17:08:55 +0800
+
 da820c-system (1.0.8+deb9) stretch; urgency=low
 
   * fix: fix typo for mx-ver
