@@ -45,7 +45,7 @@ declare CUR_MODE
 check_root_user() {
 	if [ x"$(whoami)" != x"root" ]; then
 		echo "Permission denied."
-		exit -3
+		exit 1
 	fi
 }
 
@@ -69,7 +69,7 @@ save_status() {
 	echo "Save current status to $UARTCONF ..."
 	if [[ ! -f "$UARTCONF" ]]; then
 		echo "setinterface config file $UARTCONF is not existed. Exit."
-		exit 3
+		exit 1
 	fi
 
 	index=0
@@ -91,7 +91,7 @@ get_port_mode() {
 		exp_board_uart_mode $port
 	else
 		echo "Target device port $1 is invalid. Exit."
-		exit -1
+		exit 1
 	fi
 }
 
@@ -125,7 +125,7 @@ io_board_uart_mode() {
 		echo 1 > /sys/class/gpio/uart${port}_422/value 2>/dev/null
 	else
 		echo "Cannot recognize the mode."
-		exit -1
+		exit 1
 	fi
 
 	io_board_uart_mode $port
@@ -150,7 +150,7 @@ exp_board_uart_mode() {
 		exp_board_set_uart_mode $RS422_MODE
 	else
 		echo "Cannot recognize the mode."
-		exit -1
+		exit 1
 	fi
 
 	exp_board_uart_mode $port
@@ -191,6 +191,7 @@ exp_board_get_uart_mode() {
 
 	echo "Cannot recognize current mode."
 	CUR_MODE=$UNKNOWN_MODE
+	exit 1
 }
 
 exp_board_set_uart_mode() {
@@ -279,7 +280,7 @@ main() {
 
 	if [ ! -e $1 ]; then
 		echo "Target device node $1 is not existed. Exit."
-		exit -1
+		exit 1
 	fi
 
 	if [ $port -ge 0 ] && [ $port -le 1 ]; then
@@ -288,7 +289,7 @@ main() {
 		exp_board_uart_mode $port $mode
 	else
 		echo "Target device node $1 is invalid. Exit."
-		exit -1
+		exit 1
 	fi
 }
 
