@@ -1,3 +1,11 @@
+da820c-system (1.0.10+deb9) stretch; urgency=low
+
+  * fix: add workaround for FT260 when init
+  * fix: fix setinterface exit value
+  * fix: add retry to ft260 workaround
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Mon, 23 Sep 2019 10:18:50 +0800
+
 da820c-system (1.0.9+deb9) stretch; urgency=low
 
   * feat: add S3 suspend back event to reload ftdi driver
