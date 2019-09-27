@@ -13,3 +13,4 @@ base-system/common-password /etc/pam.d
 base-system/sshd_config /etc/ssh
 base-system/moxa.sh /etc/profile.d
 base-system/sensor3.conf /etc/sensors.d
+base-system/pm_suspend_init /etc/pm/sleep.d
