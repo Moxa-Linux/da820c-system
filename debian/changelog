@@ -1,3 +1,9 @@
+da820c-system (1.0.12) stretch; urgency=medium
+
+  * fix: display a recovery message to notify the user
+
+ -- Wes Huang <Wes.Huang@moxa.com>  Thu, 03 Oct 2019 07:14:11 -0400
+
 da820c-system (1.0.11) stretch; urgency=medium
 
   * fix: support to detect expansion card when re-binding ft260
