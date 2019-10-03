@@ -1,0 +1,13 @@
+#! /bin/sh
+#set -e;
+
+#depmod -ae
+
+#modprobe moxa_irigb
+
+# Add moxa_irigb into /etc/modules
+#grep moxa_irigb /etc/modules
+#if [ "$?" != "0" ]; then
+#	sed -i '$ a moxa_irigb' /etc/modules
+#fi
+

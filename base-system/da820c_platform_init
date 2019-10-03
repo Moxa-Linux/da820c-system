@@ -1,0 +1,156 @@
+#!/bin/bash
+
+UARTCONF="/etc/moxa-configs/setinterface.conf"
+UARTPROG="/sbin/setinterface"
+MAX_FT260_RETRY=10
+
+bind_ft260_driver(){
+	for filename in /sys/bus/i2c/devices/i2c-*/name; do
+		i2c_devname=$(cat ${filename})
+		if [[ $i2c_devname == *"FT260"* ]]; then
+			i2c_devpath=$(echo ${filename%/*})
+			echo "pca9535 0x26" > ${i2c_devpath}/new_device
+			echo "pca9535 0x27" > ${i2c_devpath}/new_device
+		fi
+	done
+}
+
+unbind_ft260_driver(){
+	for filename in /sys/bus/i2c/devices/i2c-*/name; do
+		i2c_devname=$(cat ${filename})
+		if [[ $i2c_devname == *"FT260"* ]]; then
+			i2c_devpath=$(echo ${filename%/*})
+			echo "0x26" > ${i2c_devpath}/delete_device
+			echo "0x27" > ${i2c_devpath}/delete_device
+		fi
+	done
+}
+
+export_sys_gpio() {
+	local TARGET_GPIOCHIP=$1
+	local GPIOCHIP_NAME=gpiochip
+	local GPIO_FS_PATH=/sys/class/gpio
+	local GPIO_EXPORT="export"
+
+	if [ x"$2" == x"unexport" ]; then
+		GPIO_EXPORT="unexport"
+	fi
+
+	# Export GPIOs
+	ls $GPIO_FS_PATH | grep $GPIOCHIP_NAME | while read -r chip ; do
+		GPIO_LABEL=$(cat $GPIO_FS_PATH/$chip/label)
+		if [[ "$GPIO_LABEL" != *"$TARGET_GPIOCHIP"* ]]; then
+			continue
+		fi
+
+		pinstart=$(echo $chip | sed s/$GPIOCHIP_NAME/\\n/g)
+		count=$(cat $GPIO_FS_PATH/$chip/ngpio)
+		for (( i=0; i<${count}; i++ )); do
+			echo $((${pinstart}+${i})) > $GPIO_FS_PATH/$GPIO_EXPORT 2>/dev/null
+		done
+	done
+}
+
+setup_default_uart_mode() {
+	if [[ ! -f "$UARTCONF" ]]; then
+		echo "setinterface config file $UARTCONF is not existed. Exit."
+		exit 3
+	fi
+
+	if [[ ! -f "$UARTPROG" ]]; then
+		echo "setinterface program file $UARTPROG is not existed. Exit."
+		exit 3
+	fi
+
+	max_port_num=$(ls /dev/ttyM* | wc -l)
+	source $UARTCONF
+
+	index=0
+	while [ $index -lt $max_port_num ]; do
+		mode=$(eval "echo \$PORT$index")
+		devpath="/dev/ttyM$index"
+		if [ $mode -gt 2  ] || [ $mode -lt 0 ]; then
+			echo "Cannot recognize the mode. Set $devpath to RS232 mode."
+			mode=0
+		fi
+
+		if [ $mode ] && [ -e "$devpath" ]; then
+			echo "path $devpath mode $mode"
+			eval "$UARTPROG $devpath $mode"
+		fi
+		let 'index=index + 1'
+	done
+}
+
+# workaround for FT260 cant send i2c message when warm reboot
+check_ft260_is_alive() {
+	# check expansion card serial port. /dev/ttyM2
+	local ex_card_serial_port="/dev/ttyM2"
+	local ret_val="0"
+	local pca953x_failed="0"
+
+	for i in `seq 1 $MAX_FT260_RETRY`
+	do
+		if [ -e "${ex_card_serial_port}" ]; then
+			"${UARTPROG}" "${ex_card_serial_port}"
+			ret_val="${?}"
+		else
+			return 0
+		fi
+
+		if [ "${ret_val}" != "0" ]; then
+			pca953x_failed="1"
+			echo "Unable to read pca953x register, try to recover" > /dev/console
+			echo "FT260 is broken, rebind USB host driver (retry: ${i}/${MAX_FT260_RETRY})"
+			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/unbind
+			sleep 3
+			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/bind
+			sleep 3
+
+			# re-bind drivers again
+			start_process
+		else
+			if [ "${pca953x_failed}" == "1" ]; then
+				echo "Read the pca953x register successfully" > /dev/console
+			fi
+			# check re-bind ok and return
+			return 0
+		fi
+	done
+}
+
+start_process() {
+	bind_ft260_driver
+	export_sys_gpio "moxa-gpio"
+	export_sys_gpio "pca9535"
+	setup_default_uart_mode
+}
+
+stop_procsess() {
+	export_sys_gpio "moxa-gpio" unexport
+	export_sys_gpio "pca9535" unexport
+	unbind_ft260_driver
+}
+
+main(){
+	case "$1" in
+		start)
+			start_process
+			check_ft260_is_alive
+		;;
+		stop)
+			stop_procsess
+		;;
+		restart)
+			stop_procsess
+			start_process
+			check_ft260_is_alive
+		;;
+		*)
+			echo "Usage: $0 start|stop|restart" >&2
+			exit 3
+		;;
+	esac
+}
+
+main $1
