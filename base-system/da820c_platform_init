@@ -98,7 +98,7 @@ check_ft260_is_alive() {
 			start_process
 		else
 			# check re-bind ok and return
-			return
+			return 0
 		fi
 	done
 }
