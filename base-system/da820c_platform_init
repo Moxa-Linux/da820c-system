@@ -84,10 +84,20 @@ setup_default_uart_mode() {
 
 # workaround for FT260 cant send i2c message when warm reboot
 check_ft260_is_alive() {
+	# check expansion card serial port. /dev/ttyM2
+	local ex_card_serial_port="/dev/ttyM2"
+	local ret_val="0"
+
 	for i in `seq 1 $MAX_FT260_RETRY`
 	do
-		${UARTPROG} /dev/ttyM2
-		if [ $? != 0 ]; then
+		if [ -e "${ex_card_serial_port}" ]; then
+			"${UARTPROG}" "${ex_card_serial_port}"
+			ret_val="${?}"
+		else
+			return 0
+		fi
+
+		if [ "${ret_val}" != "0" ]; then
 			echo "FT260 is broken, rebind USB host driver (retry: ${i}/${MAX_FT260_RETRY})"
 			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/unbind
 			sleep 3
