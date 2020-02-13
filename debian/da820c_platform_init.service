@@ -1,0 +1,13 @@
+[Unit]
+Description=Moxa DA-820C series initial setting
+After=getty.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 3
+ExecStart=/sbin/da820c_platform_init start
+ExecStop=/sbin/da820c_platform_init stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target poweroff.target
