@@ -1,7 +1,15 @@
 #!/bin/bash
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Authors:
+#	2019	Elvis Yao	<ElvisCW.Yao@moxa.com>
+#
+# Platform:
+#	Moxa DA-820C series
+#
 
-UARTCONF="/etc/moxa-configs/setinterface.conf"
-UARTPROG="/sbin/setinterface"
+UARTPROG="/sbin/mx-uart-ctl"
 MAX_FT260_RETRY=10
 
 bind_ft260_driver(){
@@ -26,7 +34,63 @@ unbind_ft260_driver(){
 	done
 }
 
-export_sys_gpio() {
+# workaround for FT260 cant send i2c message when warm reboot
+check_ft260_is_alive() {
+	# check expansion card serial start from port 2
+	local ex_card_serial_port="2"
+	local ret_val="0"
+	local pca953x_failed="0"
+
+	for i in `seq 1 $MAX_FT260_RETRY`
+	do
+		if [ -e "/dev/ttyM${ex_card_serial_port}" ]; then
+			${UARTPROG} -p ${ex_card_serial_port} -m 0 2>&1 > /dev/null
+			ret_val="${?}"
+		else
+			return 0
+		fi
+
+		if [ "${ret_val}" != "0" ]; then
+			pca953x_failed="1"
+			echo "Unable to read pca953x register, try to recover" > /dev/console
+			echo "FT260 is broken, rebind USB host driver (retry: ${i}/${MAX_FT260_RETRY})"
+			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/unbind
+			sleep 3
+			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/bind
+			sleep 3
+
+			# re-bind drivers again
+			uart_exp_card_start
+		else
+			if [ "${pca953x_failed}" == "1" ]; then
+				echo "Read the pca953x register successfully" > /dev/console
+			fi
+			# check re-bind ok and return
+			return 0
+		fi
+	done
+}
+
+init_gpio() {
+	local gpio=${1}
+	local direction=${2}
+	local value=${3}
+	local active_low=${4}
+
+	if [ ! -e "/sys/class/gpio/gpio${gpio}" ]; then
+		echo ${gpio} > "/sys/class/gpio/export"
+	fi
+
+	if [ "${direction}" == "out" ]; then
+                echo ${direction} > "/sys/class/gpio/gpio${gpio}/direction"
+                [ ! -z "${active_low}" ] && \
+                        echo ${active_low} > "/sys/class/gpio/gpio${gpio}/active_low"
+                [ ! -z "${value}" ] && \
+                        echo ${value} > "/sys/class/gpio/gpio${gpio}/value"
+	fi
+}
+
+export_batch_sysgpio() {
 	local TARGET_GPIOCHIP=$1
 	local GPIOCHIP_NAME=gpiochip
 	local GPIO_FS_PATH=/sys/class/gpio
@@ -46,104 +110,95 @@ export_sys_gpio() {
 		pinstart=$(echo $chip | sed s/$GPIOCHIP_NAME/\\n/g)
 		count=$(cat $GPIO_FS_PATH/$chip/ngpio)
 		for (( i=0; i<${count}; i++ )); do
-			echo $((${pinstart}+${i})) > $GPIO_FS_PATH/$GPIO_EXPORT 2>/dev/null
+			init_gpio $((${pinstart}+${i})) "out" "0"
 		done
 	done
 }
 
-setup_default_uart_mode() {
-	if [[ ! -f "$UARTCONF" ]]; then
-		echo "setinterface config file $UARTCONF is not existed. Exit."
-		exit 3
-	fi
+initial_it87_uart() {
+	# Port 0
+	init_gpio "449" "out" "0"
+	init_gpio "450" "out" "0"
+	init_gpio "451" "out" "0"
 
-	if [[ ! -f "$UARTPROG" ]]; then
-		echo "setinterface program file $UARTPROG is not existed. Exit."
-		exit 3
-	fi
+	# Port 1
+	init_gpio "452" "out" "0"
+	init_gpio "453" "out" "0"
+	init_gpio "454" "out" "0"
 
-	max_port_num=$(ls /dev/ttyM* | wc -l)
-	source $UARTCONF
-
-	index=0
-	while [ $index -lt $max_port_num ]; do
-		mode=$(eval "echo \$PORT$index")
-		devpath="/dev/ttyM$index"
-		if [ $mode -gt 2  ] || [ $mode -lt 0 ]; then
-			echo "Cannot recognize the mode. Set $devpath to RS232 mode."
-			mode=0
-		fi
-
-		if [ $mode ] && [ -e "$devpath" ]; then
-			echo "path $devpath mode $mode"
-			eval "$UARTPROG $devpath $mode"
-		fi
-		let 'index=index + 1'
-	done
+	# setup UART port0~1 default mode as RS-232
+	/sbin/mx-uart-ctl -p 0 -m 0
+	/sbin/mx-uart-ctl -p 1 -m 0
 }
 
-# workaround for FT260 cant send i2c message when warm reboot
-check_ft260_is_alive() {
-	# check expansion card serial port. /dev/ttyM2
-	local ex_card_serial_port="/dev/ttyM2"
-	local ret_val="0"
-	local pca953x_failed="0"
+initial_dio() {
+	# setup DIO output pins (DO0~DO1)
+	init_gpio "467" "out" "0"
+	init_gpio "468" "out" "0"
 
-	for i in `seq 1 $MAX_FT260_RETRY`
-	do
-		if [ -e "${ex_card_serial_port}" ]; then
-			"${UARTPROG}" "${ex_card_serial_port}"
-			ret_val="${?}"
-		else
-			return 0
-		fi
-
-		if [ "${ret_val}" != "0" ]; then
-			pca953x_failed="1"
-			echo "Unable to read pca953x register, try to recover" > /dev/console
-			echo "FT260 is broken, rebind USB host driver (retry: ${i}/${MAX_FT260_RETRY})"
-			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/unbind
-			sleep 3
-			echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/bind
-			sleep 3
-
-			# re-bind drivers again
-			start_process
-		else
-			if [ "${pca953x_failed}" == "1" ]; then
-				echo "Read the pca953x register successfully" > /dev/console
-			fi
-			# check re-bind ok and return
-			return 0
-		fi
-	done
+	# export DIO input pins (DI0~DI5)
+	init_gpio "506"
+	init_gpio "507"
+	init_gpio "508"
+	init_gpio "509"
+	init_gpio "470"
+	init_gpio "471"
 }
 
-start_process() {
+initial_leds() {
+	# setup LED output value, active_low is [High]
+	init_gpio "496" "out" "0" "1"
+	init_gpio "497" "out" "0" "1"
+	init_gpio "498" "out" "0" "1"
+	init_gpio "499" "out" "0" "1"
+	init_gpio "500" "out" "0" "1"
+	init_gpio "501" "out" "0" "1"
+	init_gpio "502" "out" "0" "1"
+	init_gpio "503" "out" "0" "1"
+}
+
+initial_relay() {
+	# setup relay output value
+	init_gpio "493" "out" "0"
+}
+
+uart_exp_card_start() {
 	bind_ft260_driver
-	export_sys_gpio "moxa-gpio"
-	export_sys_gpio "pca9535"
-	setup_default_uart_mode
+	export_batch_sysgpio "pca9535"
+
+	# setup expansion card DN-SP08-I-TB/DB
+	# UART port 0~7 default mode as RS-232
+	/sbin/mx-uart-ctl -p 2 -m 0
+	/sbin/mx-uart-ctl -p 3 -m 0
+	/sbin/mx-uart-ctl -p 4 -m 0
+	/sbin/mx-uart-ctl -p 5 -m 0
+	/sbin/mx-uart-ctl -p 6 -m 0
+	/sbin/mx-uart-ctl -p 7 -m 0
+	/sbin/mx-uart-ctl -p 8 -m 0
+	/sbin/mx-uart-ctl -p 9 -m 0
 }
 
-stop_procsess() {
-	export_sys_gpio "moxa-gpio" unexport
-	export_sys_gpio "pca9535" unexport
+uart_exp_card_stop() {
 	unbind_ft260_driver
+	export_batch_sysgpio "pca9535" unexport
 }
 
 main(){
 	case "$1" in
 		start)
-			start_process
+			initial_it87_uart
+			initial_dio
+			initial_leds
+			initial_relay
+			uart_exp_card_start
 			check_ft260_is_alive
 		;;
 		stop)
-			stop_procsess
+			uart_exp_card_stop
 		;;
 		restart)
-			stop_procsess
-			start_process
+			uart_exp_card_stop
+			uart_exp_card_start
 			check_ft260_is_alive
 		;;
 		*)

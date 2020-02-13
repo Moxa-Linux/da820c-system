@@ -7,3 +7,6 @@ modprobe ftdi_sio
 # it needs to restart service after S3 suspend
 systemctl stop da820c_platform_init.service
 systemctl start da820c_platform_init.service
+
+# restart HSR PRP card
+systemctl restart mx_hsrprp.service
