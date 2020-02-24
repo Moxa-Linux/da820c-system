@@ -7,4 +7,5 @@ base-system/kversion /sbin
 base-system/blacklist.conf /etc/modprobe.d
 base-system/sensor3.conf /etc/sensors.d
 base-system/pm_suspend_init /etc/pm/sleep.d
+base-system/snmpd.local.conf /usr/share/snmp
 moxa-configs /etc
