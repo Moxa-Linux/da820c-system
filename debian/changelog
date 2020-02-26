@@ -1,3 +1,10 @@
+da820c-system (1.2.0) stretch; urgency=medium
+
+  * feat: add snmpd.local.conf to support MXview
+  * refactor: remove security settings due to it's not defined yet
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Mon, 24 Feb 2020 14:15:26 +0800
+
 da820c-system (1.1.0) stretch; urgency=medium
 
   * fix: add init gpio functions to init file

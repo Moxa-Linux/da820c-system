@@ -23,6 +23,8 @@ Depends: ${misc:Depends},
          tpm2-tools (>= 3.1.3-2),
          libtss2-udev (>= 2.1.0-4),
          libtss2-esys0 (>= 2.1.0-4),
-         lm-sensors
+         snmpd (>= 5.7.3),
+         lldpd (>= 0.9.6-1),
+         lm-sensors (>= 1:3.4.0-4)
 Description: Base system for DA-820C
  It contains the necessary tools for setting up DA-820C
