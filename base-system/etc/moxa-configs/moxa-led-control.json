@@ -1,0 +1,27 @@
+{
+	"CONFIG_VERSION": "1.1.1",
+	"LED_TYPES": [
+		{
+			"TYPE": "SIGNAL",
+			"NUM_OF_GROUPS": 0,
+			"NUM_OF_LEDS_PER_GROUP": 0
+		},
+		{
+			"TYPE": "PROGRAMMABLE",
+			"NUM_OF_GROUPS": 1,
+			"NUM_OF_LEDS_PER_GROUP": 8,
+			"PATHS": [
+				[
+					"DA820C:GREEN:PRG1",
+					"DA820C:GREEN:PRG2",
+					"DA820C:GREEN:PRG3",
+					"DA820C:GREEN:PRG4",
+					"DA820C:GREEN:PRG5",
+					"DA820C:GREEN:PRG6",
+					"DA820C:GREEN:PRG7",
+					"DA820C:GREEN:PRG8"
+				]
+			]
+		}
+	]
+}
