@@ -145,18 +145,6 @@ initial_dio() {
 	init_gpio "471"
 }
 
-initial_leds() {
-	# setup LED output value, active_low is [High]
-	init_gpio "496" "out" "0" "1"
-	init_gpio "497" "out" "0" "1"
-	init_gpio "498" "out" "0" "1"
-	init_gpio "499" "out" "0" "1"
-	init_gpio "500" "out" "0" "1"
-	init_gpio "501" "out" "0" "1"
-	init_gpio "502" "out" "0" "1"
-	init_gpio "503" "out" "0" "1"
-}
-
 initial_relay() {
 	# setup relay output value
 	init_gpio "493" "out" "0"
@@ -188,7 +176,6 @@ main(){
 		start)
 			initial_it87_uart
 			initial_dio
-			initial_leds
 			initial_relay
 			uart_exp_card_start
 			check_ft260_is_alive
