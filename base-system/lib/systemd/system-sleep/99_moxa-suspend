@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" = "post" ] && [ "$2" = "suspend" ]; then
+	# reload FTDI 4231 driver due to ttyUSB port index is swapped
+	modprobe -r ftdi_sio
+	modprobe ftdi_sio
+	
+	# it needs to restart service after S3 suspend
+	systemctl restart da820c-base-system.service
+	
+	# restart HSR PRP card
+	systemctl restart mx_hsrprp.service
+fi
+
+exit 0
