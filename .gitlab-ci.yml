@@ -17,7 +17,7 @@ mil-internal-release_build:
         - export PKG_FW_VERSION=${version}
         - export PKG_BUILDDATE=$(date +%y%m%d%H)
         - dpkg --add-architecture amd64
-        - echo "deb http://mil-internal-apt:8080/mirror-debian_20190909/ stretch main contrib non-free" > /etc/apt/sources.list
+        - echo "deb http://mil-internal-apt:8080/mirror-debian_20200211/ stretch main contrib non-free" > /etc/apt/sources.list
         - curl -fsSL http://mil-internal-apt:8080/mil_internal_apt.gpg | apt-key add -
         - apt-get update
         - apt-get install build-essential libc6-dev -y --allow-unauthenticated
