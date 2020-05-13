@@ -1,0 +1,15 @@
+[Unit]
+Description=Moxa DA820C series initial setting
+Requires=sys-devices-pnp0-00:08-tty-ttyS0.device
+After=sys-devices-pnp0-00:08-tty-ttyS0.device
+Before=rc-local.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/da820c_platform_init start
+ExecStop=/sbin/da820c_platform_init stop
+RemainAfterExit=yes
+ExecStartPre=/bin/sleep 1
+
+[Install]
+WantedBy=multi-user.target

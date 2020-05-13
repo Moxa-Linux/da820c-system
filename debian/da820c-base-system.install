@@ -1,11 +1,1 @@
-base-system/10-serial.rules /etc/udev/rules.d
-base-system/11-ft260-pca9535.rules /etc/udev/rules.d
-base-system/70-persistent-net.rules /etc/udev/rules.d
-base-system/da820c_platform_init /sbin
-base-system/setinterface /sbin
-base-system/kversion /sbin
-base-system/blacklist.conf /etc/modprobe.d
-base-system/sensor3.conf /etc/sensors.d
-base-system/pm_suspend_init /etc/pm/sleep.d
-base-system/snmpd.local.conf /usr/share/snmp
-moxa-configs /etc
+base-system/* /
