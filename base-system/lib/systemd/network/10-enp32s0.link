@@ -1,0 +1,7 @@
+[Match]
+Driver=igb
+Path=pci-0000:0b:00.0
+
+[Link]
+Name=enp32s0
+
