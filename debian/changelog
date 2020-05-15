@@ -1,3 +1,9 @@
+da820c-system (1.3.1) stretch; urgency=medium
+
+  * refactor: replace rename NIC method via systemd link
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Fri, 15 May 2020 18:50:18 +0800
+
 da820c-system (1.3.0) stretch; urgency=medium
 
   * refactor: update base system to root file system style
