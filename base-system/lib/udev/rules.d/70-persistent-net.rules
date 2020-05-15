@@ -1,4 +1,0 @@
-# to set static interface name to avoid rename again (when expansion card was inserted)
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="igb", ENV{DEVPATH}=="/devices/pci0000:00/0000:00:1c.5/*", NAME="enp30s0"
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="igb", ENV{DEVPATH}=="/devices/pci0000:00/0000:00:1c.6/*", NAME="enp31s0"
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="igb", ENV{DEVPATH}=="/devices/pci0000:00/0000:00:1c.7/*", NAME="enp32s0"
