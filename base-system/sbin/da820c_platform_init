@@ -146,8 +146,8 @@ initial_dio() {
 }
 
 initial_relay() {
-	# setup relay output value
-	init_gpio "493" "out" "0"
+	# export relay gpio pin
+	init_gpio "493"
 }
 
 uart_exp_card_start() {
