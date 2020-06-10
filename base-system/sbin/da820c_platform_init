@@ -132,11 +132,11 @@ initial_it87_uart() {
 }
 
 initial_dio() {
-	# setup DIO output pins (DO0~DO1)
-	init_gpio "467" "out" "0"
-	init_gpio "468" "out" "0"
+	# export output pins (DO0~DO1)
+	init_gpio "467"
+	init_gpio "468"
 
-	# export DIO input pins (DI0~DI5)
+	# export input pins (DI0~DI5)
 	init_gpio "506"
 	init_gpio "507"
 	init_gpio "508"
