@@ -127,16 +127,16 @@ initial_it87_uart() {
 	init_gpio "454" "out" "0"
 
 	# setup UART port0~1 default mode as RS-232
-	/sbin/mx-uart-ctl -p 0 -m 0
-	/sbin/mx-uart-ctl -p 1 -m 0
+	 ${UARTPROG} -p 0 -m 0
+	 ${UARTPROG} -p 1 -m 0
 }
 
 initial_dio() {
-	# setup DIO output pins (DO0~DO1)
-	init_gpio "467" "out" "0"
-	init_gpio "468" "out" "0"
+	# export output pins (DO0~DO1)
+	init_gpio "467"
+	init_gpio "468"
 
-	# export DIO input pins (DI0~DI5)
+	# export input pins (DI0~DI5)
 	init_gpio "506"
 	init_gpio "507"
 	init_gpio "508"
@@ -146,8 +146,8 @@ initial_dio() {
 }
 
 initial_relay() {
-	# setup relay output value
-	init_gpio "493" "out" "0"
+	# export relay gpio pin
+	init_gpio "493"
 }
 
 uart_exp_card_start() {
@@ -156,14 +156,14 @@ uart_exp_card_start() {
 
 	# setup expansion card DN-SP08-I-TB/DB
 	# UART port 0~7 default mode as RS-232
-	/sbin/mx-uart-ctl -p 2 -m 0
-	/sbin/mx-uart-ctl -p 3 -m 0
-	/sbin/mx-uart-ctl -p 4 -m 0
-	/sbin/mx-uart-ctl -p 5 -m 0
-	/sbin/mx-uart-ctl -p 6 -m 0
-	/sbin/mx-uart-ctl -p 7 -m 0
-	/sbin/mx-uart-ctl -p 8 -m 0
-	/sbin/mx-uart-ctl -p 9 -m 0
+	${UARTPROG} -p 2 -m 0
+	${UARTPROG} -p 3 -m 0
+	${UARTPROG} -p 4 -m 0
+	${UARTPROG} -p 5 -m 0
+	${UARTPROG} -p 6 -m 0
+	${UARTPROG} -p 7 -m 0
+	${UARTPROG} -p 8 -m 0
+	${UARTPROG} -p 9 -m 0
 }
 
 uart_exp_card_stop() {
