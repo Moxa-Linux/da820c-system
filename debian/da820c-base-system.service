@@ -1,7 +1,7 @@
 [Unit]
 Description=Moxa DA820C series initial setting
-Requires=sys-devices-pnp0-00:08-tty-ttyS0.device
-After=sys-devices-pnp0-00:08-tty-ttyS0.device
+Requires=dev-ttyS0.device
+After=dev-ttyS0.device
 Before=rc-local.service
 
 [Service]

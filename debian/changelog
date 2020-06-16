@@ -1,3 +1,12 @@
+da820c-system (1.3.3) stretch; urgency=medium
+
+  * fix: remove setup DIO output value when boot
+  * fix: replace /sbin/mx-uart-ctl as UARTPROG parameter
+  * fix: debian: add depends on moxa libs
+  * fix: debian: update init service requires as dev-ttyS0.device
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Wed, 10 Jun 2020 15:23:22 +0800
+
 da820c-system (1.3.2) stretch; urgency=medium
 
   * fix: debian: update control file for depends moxa-hsrprp-tools v1.1.1
