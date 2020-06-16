@@ -131,20 +131,6 @@ initial_it87_uart() {
 	 ${UARTPROG} -p 1 -m 0
 }
 
-initial_dio() {
-	# export output pins (DO0~DO1)
-	init_gpio "467"
-	init_gpio "468"
-
-	# export input pins (DI0~DI5)
-	init_gpio "506"
-	init_gpio "507"
-	init_gpio "508"
-	init_gpio "509"
-	init_gpio "470"
-	init_gpio "471"
-}
-
 initial_relay() {
 	# export relay gpio pin
 	init_gpio "493"
@@ -175,7 +161,6 @@ main(){
 	case "$1" in
 		start)
 			initial_it87_uart
-			initial_dio
 			initial_relay
 			uart_exp_card_start
 			check_ft260_is_alive
